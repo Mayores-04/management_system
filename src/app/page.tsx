@@ -19,11 +19,15 @@ export default function UsersList() {
         if (!res.ok) {
           throw new Error("Failed to fetch users");
         }
-        const data = await res.json();
+        const data: User[] = await res.json();
         setUsers(data);
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error(err);
-        setError(err.message || "Something went wrong");
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError("Something went wrong");
+        }
       } finally {
         setLoading(false);
       }
@@ -39,12 +43,12 @@ export default function UsersList() {
     <div>
       <h1 className="text-3xl">Data</h1>
       <ul>
-      {users.map((user) => (
-        <li key={user.id}>
-          {user.name} ({user.email})
-        </li>
-      ))}
-    </ul>
-      </div>
+        {users.map((user) => (
+          <li key={user.id}>
+            {user.name} ({user.email})
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
