@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import pool from "@/backend/db";
+import pool from "@/backend/db/dbConnection";
 
 // Handle GET request → fetch all users
 export async function GET() {
   try {
-    const [rows] = await pool.query("SELECT * FROM users_info");
+    const [rows] = await pool.query("SELECT * FROM users");
     // ✅ rows is an array, perfect for .map()
     return NextResponse.json(rows);
   } catch (error) {

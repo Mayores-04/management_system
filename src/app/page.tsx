@@ -7,30 +7,44 @@ type User = {
   email: string;
 };
 
-export default function Home() {
+export default function UsersList() {
   const [users, setUsers] = useState<User[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const res = await fetch("/api/users");
-      const data = await res.json();
-
-      // ✅ Ensure it's always an array
-      setUsers(Array.isArray(data) ? data : []);
+      try {
+        const res = await fetch("/api/users");  
+        if (!res.ok) {
+          throw new Error("Failed to fetch users");
+        }
+        const data = await res.json();
+        setUsers(data);
+      } catch (err: any) {
+        console.error(err);
+        setError(err.message || "Something went wrong");
+      } finally {
+        setLoading(false);
+      }
     };
+
     fetchUsers();
   }, []);
 
+  if (loading) return <p>Loading users...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+
   return (
     <div>
-      <h1>Users from MySQL</h1>
+      <h1 className="text-3xl">Data</h1>
       <ul>
-        {users.map((u) => (
-          <li key={u.id}>
-            {u.name} ({u.email})
-          </li>
-        ))}
-      </ul>
-    </div>
+      {users.map((user) => (
+        <li key={user.id}>
+          {user.name} ({user.email})
+        </li>
+      ))}
+    </ul>
+      </div>
   );
 }
